@@ -1,6 +1,13 @@
 const express = require('express')
 const expressGraphQL = require('express-graphql').graphqlHTTP
-const { GraphQLSchema, GraphQLObjectType, GraphQLString } = require('graphql')
+const {
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLList,
+  GraphQLInt,
+  GraphQLNonNull,
+} = require('graphql')
 const app = express()
 
 const authors = [
@@ -20,16 +27,80 @@ const books = [
   { id: 8, name: 'Beyond the Shadows', authorId: 3 },
 ]
 
-const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: 'HelloWorld',
-    fields: () => ({
-      message: {
-        type: GraphQLString,
-        resolve: () => 'Hello World',
+const AuthorType = new GraphQLObjectType({
+  name: 'Author',
+  description: 'This represents a author of a book',
+  fields: () => ({
+    id: { type: GraphQLNonNull(GraphQLInt) },
+    name: { type: GraphQLNonNull(GraphQLString) },
+    books: {
+      type: new GraphQLList(BookType),
+      resolve: (author) => {
+        return books.filter((book) => book.authorId === author.id)
       },
-    }),
+    },
   }),
+})
+
+const BookType = new GraphQLObjectType({
+  name: 'Book',
+  description: 'This represents a book written by an author',
+  fields: () => ({
+    id: { type: GraphQLNonNull(GraphQLInt) },
+    name: { type: GraphQLNonNull(GraphQLString) },
+    authorId: { type: GraphQLNonNull(GraphQLInt) },
+    author: {
+      type: AuthorType,
+      resolve: (book) => {
+        return authors.find((author) => author.id === book.authorId)
+      },
+    },
+  }),
+})
+
+const RootQueryType = new GraphQLObjectType({
+  name: 'Query',
+  description: 'Root Query',
+  fields: () => ({
+    // Query for a single book by passing an id argument
+    book: {
+      type: BookType,
+      description: 'A Single Book',
+      args: {
+        id: { type: GraphQLInt },
+      },
+      resolve: (parent, args) => books.find((book) => book.id === args.id),
+    },
+
+    // Query books
+    books: {
+      type: new GraphQLList(BookType),
+      description: 'List of All Books',
+      resolve: () => books,
+    },
+
+    // Query authors
+    authors: {
+      type: new GraphQLList(AuthorType),
+      description: 'List of All Authors',
+      resolve: () => authors,
+    },
+
+    // Query for a single author by passing an id argument
+    author: {
+      type: AuthorType,
+      description: 'A Single Author',
+      args: {
+        id: { type: GraphQLInt },
+      },
+      resolve: (parent, args) =>
+        authors.find((author) => author.id === args.id),
+    },
+  }),
+})
+
+const schema = new GraphQLSchema({
+  query: RootQueryType,
 })
 
 app.use(
