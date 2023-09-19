@@ -19,6 +19,20 @@ npm run dev
 
 - Open the GraphQL playground on `http://localhost:4000/graphql`
 
+## Run the frontend app configured with Apollo Client
+
+> Note: Make sure the server is running
+
+```bash
+cd client
+npm i
+npm run dev
+```
+
+- The frontend app will be running on `http://localhost:5173/`
+
+> Now you can go in `App.jsx` and start writing your queries and mutations
+
 ## GraphQL queries
 
 > A GraphQL query is used to read or fetch values while a mutation is used to write or post values
