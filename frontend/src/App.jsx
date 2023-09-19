@@ -1,6 +1,9 @@
 import './App.css'
 import { useQuery, gql } from '@apollo/client'
 
+// NOTE: REMEMBER TO IMPLEMENT APOLLO PROVIDER IN main.jsx
+// TIP: OPEN http://localhost:4000/graphql TO TEST QUERIES AND MUTATIONS
+
 // Define a GraphQL query
 const GET_BOOKS = gql`
   query {
@@ -21,7 +24,7 @@ function App() {
 
   return (
     <>
-      <h1>GraphQL Tutorial</h1>
+      <h1>GraphQL Data</h1>
       <ul>
         {books.map((book, index) => (
           <li key={index}>{book.name}</li>
