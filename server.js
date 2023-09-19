@@ -8,6 +8,8 @@ const {
   GraphQLInt,
   GraphQLNonNull,
 } = require('graphql')
+const cors = require('cors')
+
 const app = express()
 
 const authors = [
@@ -161,6 +163,14 @@ const schema = new GraphQLSchema({
   query: RootQueryType,
   mutation: RootMutationType,
 })
+
+// Use the CORS middleware to allow requests from your React app's origin
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Replace with your frontend app's origin
+    // credentials: true, // You might need this if you're using cookies or sessions
+  })
+)
 
 app.use(
   '/graphql',
